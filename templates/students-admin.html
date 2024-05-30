@@ -1,0 +1,60 @@
+{% extends "index.html" %}
+
+
+{% block content %}
+<div class="main-content">
+    {% for student in data.students %}
+    <div class="main-row">
+        <div class="card bar color-white">
+            <div class="left">
+                <div class="card-strongtext"> {{ student.name}} </div>
+                <div class="card-subtext">{{ student.username }} — {{ student.uid }}</div>
+            </div>
+            <div class="middle">
+                <div class="cell {{ student.progress }}"> {{ student.progress.title() }} </div>
+            </div>
+            <div class="right">
+                {% if student.progress == 'payment' and student.receipt %}
+                    <a href="{{url_for(".get_receipt", user_id=student.uid )}}" target="_blank"><button class="btn-grey">View receipt</button></a>
+                    <button class="btn-green" onclick="approveStatus('{{student.id}}', '{{student.progress}}')">Approve</button>
+                {% elif student.progress == 'payment' %}
+                    <button disabled>No receipt</button>
+                    <button disabled>Approve</button>
+                {% elif student.progress == 'evaluation' and student.doc %}
+                    <a href="{{url_for(".get_document", user_id=student.uid )}}" target="_blank"><button class="btn-grey">View doc</button></a>
+                    <button class="btn-green" onclick="approveStatus('{{student.id}}', '{{student.progress}}')">Approve</button>
+                {% elif student.progress == 'evaluation' %}
+                    <button disabled>No doc</button>
+                    <button disabled>Approve</button>
+                {% elif student.progress == 'enrollment' %}
+                    <button class="btn-purple" onclick="modifyStudentCourses('{{student.id}}')">Enroll student</button>
+                {% else %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function approveStatus(student_id, progress) {
+        var url = '/index/students/' + student_id + '/approve/'  + progress;
+        width = 600;
+        height = 800;
+        left = (screen.width - width) / 2;
+        top = (screen.height - height) / 4;
+        var features = 'width='+width+',height='+height+',left='+left+',top='+top;
+        window.open(url, name, features);
+    }
+
+    function modifyStudentCourses(student_id) {
+        var url = '/index/students/' + student_id + '/courses';
+        width = 800;
+        height = 800;
+        left = (screen.width - width) / 2;
+        top = (screen.height - height) / 4;
+        var features = 'width='+width+',height='+height+',left='+left+',top='+top;
+        window.open(url, name, features);
+    }
+</script>
+{% endblock %}
